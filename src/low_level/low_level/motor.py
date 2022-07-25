@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String, Float32MultiArray
+from std_msgs.msg import String
+from drone_interfaces.msg import MotorPercs
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
@@ -13,22 +14,24 @@ class Motor(Node):
         self.declare_parameters(
             namespace = '',
             parameters = [
-                ('motor_pins', [17, 27, 22, 18]),
-                ('esc_max', 2000),
-                ('esc_min', 1000),
+                ('pins', [0, 0, 0, 0]),
+                ('esc_max', 0),
+                ('esc_min', 0),
+                ('debug', False)
             ]
         )
 
-        self.motor_pins = self.get_parameter('motor_pins').get_parameter_value().integer_array_value
+        self.pins = self.get_parameter('pins').get_parameter_value().integer_array_value
         self.esc_max = self.get_parameter('esc_max').get_parameter_value().integer_value
         self.esc_min = self.get_parameter('esc_min').get_parameter_value().integer_value
+        self.debug = self.get_parameter('debug').get_parameter_value().boolean_value
 
         self.pi = pigpio.pi()
         if not self.pi.connected:
             self.get_logger().error("PI NOT CONNECTED")
             exit()
         
-        for pin in self.motor_pins:
+        for pin in self.pins:
             self.pi.set_servo_pulsewidth(pin, 0)
         self.armed = False
         self.throttle = [-1, -1, -1, -1]
@@ -81,20 +84,24 @@ class Motor(Node):
         self.get_logger().info("Done arming!")
 
     def set_servos_pulsewidth(self, val: int):
-        for n, pin in enumerate(self.motor_pins):
+        for n, pin in enumerate(self.pins):
             self.pi.set_servo_pulsewidth(pin, val)
             self.throttle[n] = ((val - self.esc_min) / self.esc_max) if self.esc_min <= val <= self.esc_max else -1
 
-    def speed_callback(self, msg: Float32MultiArray):
-        vel = list(msg.data)
-
-        self.get_logger().info("Received speed: {}".format(vel))
-
+    def speed_callback(self, msg: MotorPercs):
+        vel = (msg.a, msg.b, msg.c, msg.d)
+        # self.get_logger().info("Received speed: {}".format(vel))
+        
+        dbg = []
         for n, val in enumerate(vel):
-            self.pi.set_servo_pulsewidth(self.motor_pins[n], val * (self.esc_max - self.esc_min) + self.esc_min)
+            tmp =  val * (self.esc_max - self.esc_min) + self.esc_min
+            self.pi.set_servo_pulsewidth(self.pins[n], tmp)
+            dbg.append(tmp)
+        
+        self.get_logger().info("Set speed: {}".format(dbg))
 
     def kill(self):
-        for pin in self.motor_pins:
+        for pin in self.pins:
             self.pi.write(i, 0)
         pi.stop()
 

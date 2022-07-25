@@ -13,11 +13,13 @@ class Buzzer(Node):
         self.declare_parameters(
             namespace = '',
             parameters = [
-                ('buzzer_pin', 5)
+                ('buzzer_pin', 0),
+                ('debug', False),
             ]
         )
 
         self.pin = self.get_parameter('buzzer_pin').get_parameter_value().integer_value
+        self.debug = self.get_parameter('debug').get_parameter_value().boolean_value
 
         self.pi = pigpio.pi()
         if not self.pi.connected:

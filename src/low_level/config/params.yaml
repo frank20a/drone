@@ -1,8 +1,17 @@
 /buzzer_controller:
   ros__parameters:
-    buzzer_pin: 5
+    pin: 5
 /motor_controller:
   ros__parameters:
-    motor_pins: [17, 27, 22, 18]
+    pins: [17, 27, 22, 18]
     esc_max: 2000
     esc_min: 1000
+/imu_controller:
+  ros__parameters:
+    pin: 0
+/gps_controller:
+  ros__parameters:
+    test: null
+/**:
+  ros__parameters:
+    debug: true
