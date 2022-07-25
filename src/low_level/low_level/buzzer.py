@@ -1,35 +1,80 @@
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import String
+from rclpy.qos import QoSPresetProfiles
+import pigpio
+from time import sleep
 
 
-class MinimalPublisher(Node):
+class Buzzer(Node):
 
     def __init__(self):
-        super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
+        super().__init__('buzzer_controller')
+        self.declare_parameters(
+            namespace = '',
+            parameters = [
+                ('buzzer_pin', 5)
+            ]
+        )
 
-    def timer_callback(self):
-        msg = String()
-        msg.data = 'Hello World: %d' % self.i
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
+        self.pin = self.get_parameter('buzzer_pin').get_parameter_value().integer_value
 
+        self.pi = pigpio.pi()
+        if not self.pi.connected:
+            self.get_logger().error("PI NOT CONNECTED")
+            exit()
+
+        self.pi.set_mode(self.pin, pigpio.OUTPUT)
+
+        self.create_subscription(String, "buzzer_cmd", self.callback, QoSPresetProfiles.get_from_short_key('system_default'))
+
+    def callback(self, msg: String):
+        cmd = msg.data
+
+        if cmd == 'once':
+            self.pi.write(self.pin, 1)
+            sleep(0.25)
+            self.pi.write(self.pin, 0)
+
+        elif cmd == 'on':
+            self.pi.write(self.pin, 1)
+
+        elif cmd == 'off':
+            self.pi.write(self.pin, 0)
+
+        elif cmd == 'long':
+            self.pi.write(self.pin, 1)
+            sleep(1)
+            self.pi.write(self.pin, 0)
+
+        elif cmd == 'twice':
+            self.pi.write(self.pin, 1)
+            sleep(0.25)
+            self.pi.write(self.pin, 0)
+            sleep(0.25)
+            self.pi.write(self.pin, 1)
+            sleep(0.25)
+            self.pi.write(self.pin, 0)
+        
+        elif cmd == 'error':
+            for i in range(40):
+                self.pi.write(self.pin, 1)
+                sleep(0.5 / 40)
+                self.pi.write(self.pin, 0)
+                sleep(0.5 / 40)
+
+    def kill(self):
+        self.pi.write(5, 0)
+        pi.stop()
 
 def main(args=None):
     rclpy.init(args=args)
+    node = Buzzer()
+    rclpy.spin(node)
 
-    minimal_publisher = MinimalPublisher()
+    node.kill()
 
-    rclpy.spin(minimal_publisher)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    minimal_publisher.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 
