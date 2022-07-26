@@ -17,6 +17,9 @@ endif()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MotorPercs.msg"
+  "msg/MotorCmd.msg"
+  "msg/BuzzerCmd.msg"
+  "msg/DateTime.msg"
   # "srv/AddThreeInts.srv"
 )
 

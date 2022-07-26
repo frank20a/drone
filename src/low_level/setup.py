@@ -15,7 +15,8 @@ setup(
 
         (os.path.join('share', package_name, 'launch'), 
             glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml'))
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.ini'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -28,8 +29,8 @@ setup(
         'console_scripts': [
             'buzzer = ' + package_name + '.buzzer:main',
             'motor = ' + package_name + '.motor:main',
-            'imu = ' + package_name + '.motor:main',
-            # 'gps = ' + package_name + '.gps:main',
+            'imu = ' + package_name + '.imu:main',
+            'gps = ' + package_name + '.gps:main',
             # 'ping = ' + package_name + '.ping:main',
             # 'battery = ' + package_name + '.battery:main',
             # 'led = ' + package_name + '.led:main',

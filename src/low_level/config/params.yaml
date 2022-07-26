@@ -8,10 +8,11 @@
     esc_min: 1000
 /imu_controller:
   ros__parameters:
-    pin: 0
+    freq: 60
 /gps_controller:
   ros__parameters:
-    test: null
+    baud: 115200
+    freq: 10
 /**:
   ros__parameters:
     debug: true

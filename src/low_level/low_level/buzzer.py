@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import BuzzerCmd
+from drone_interfaces.msg import BuzzerCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
