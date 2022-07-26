@@ -1,9 +1,10 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Imu, MagneticField
+from sensor_msgs.msg import Imu
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
+import RTIMU
 
 
 class IMU(Node):
@@ -19,7 +20,7 @@ class IMU(Node):
         )
 
         self.pin = self.get_parameter('pin').get_parameter_value().integer_value
-        self.debug = self.get_parameter('debug').get_parameter_value().boolean_value
+        self.debug = self.get_parameter('debug').get_parameter_value().bool_value
 
         self.pi = pigpio.pi()
         if not self.pi.connected:

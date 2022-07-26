@@ -34,5 +34,45 @@ def generate_launch_description():
             parameters = [config],
         )
     )
+
+    ld.add_entity(
+        Node(
+            package = 'low_level',
+            executable =  'imu',
+            name = 'imu_controller',
+            # output = {'both': 'log'},
+            parameters = [config],
+        )
+    )
+
+    # ld.add_entity(
+    #     Node(
+    #         package = 'low_level',
+    #         executable =  'gps',
+    #         name = 'gps_controller',
+    #         # output = {'both': 'log'},
+    #         parameters = [config],
+    #     )
+    # )
+
+    # ld.add_entity(
+    #     Node(
+    #         package = 'low_level',
+    #         executable =  'battery',
+    #         name = 'battery_controller',
+    #         # output = {'both': 'log'},
+    #         parameters = [config],
+    #     )
+    # )
     
+    # ld.add_entity(
+    #     Node(
+    #         package = 'low_level',
+    #         executable =  'ping',
+    #         name = 'ping_controller',
+    #         # output = {'both': 'log'},
+    #         parameters = [config],
+    #     )
+    # )
+
     return ld

@@ -28,6 +28,11 @@ setup(
         'console_scripts': [
             'buzzer = ' + package_name + '.buzzer:main',
             'motor = ' + package_name + '.motor:main',
+            'imu = ' + package_name + '.motor:main',
+            # 'gps = ' + package_name + '.gps:main',
+            # 'ping = ' + package_name + '.ping:main',
+            # 'battery = ' + package_name + '.battery:main',
+            # 'led = ' + package_name + '.led:main',
         ],
     },
 )

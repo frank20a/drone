@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from drone_interfaces.msg import MotorPercs
+from drone_interfaces.msg import MotorPercs, MotorCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
@@ -24,7 +24,7 @@ class Motor(Node):
         self.pins = self.get_parameter('pins').get_parameter_value().integer_array_value
         self.esc_max = self.get_parameter('esc_max').get_parameter_value().integer_value
         self.esc_min = self.get_parameter('esc_min').get_parameter_value().integer_value
-        self.debug = self.get_parameter('debug').get_parameter_value().boolean_value
+        self.debug = self.get_parameter('debug').get_parameter_value().bool_value
 
         self.pi = pigpio.pi()
         if not self.pi.connected:
@@ -36,16 +36,16 @@ class Motor(Node):
         self.armed = False
         self.throttle = [-1, -1, -1, -1]
 
-        self.create_subscription(String, "motor_cmd", self.cmd_callback, QoSPresetProfiles.get_from_short_key('system_default'))
-        self.create_subscription(Float32MultiArray, "motor_vel", self.speed_callback, QoSPresetProfiles.get_from_short_key('sensor_data'))
+        self.create_subscription(MotorCmd, "motor_cmd", self.cmd_callback, QoSPresetProfiles.get_from_short_key('system_default'))
+        self.create_subscription(MotorPercs, "motor_vel", self.speed_callback, QoSPresetProfiles.get_from_short_key('sensor_data'))
 
-    def cmd_callback(self, msg: String):
-        cmd = msg.data
+    def cmd_callback(self, msg: MotorCmd):
+        cmd = msg.cmd
 
-        if cmd == 'arm':
+        if cmd == MotorCmd.CMD_ARM:
             self.arm()
 
-        elif cmd == 'calibrate':
+        elif cmd == MotorCmd.CMD_CALIBRATE:
             self.calibrate()
 
     def calibrate(self):
@@ -89,7 +89,7 @@ class Motor(Node):
             self.throttle[n] = ((val - self.esc_min) / self.esc_max) if self.esc_min <= val <= self.esc_max else -1
 
     def speed_callback(self, msg: MotorPercs):
-        vel = (msg.a, msg.b, msg.c, msg.d)
+        vel = list(msg.vel)
         # self.get_logger().info("Received speed: {}".format(vel))
         
         dbg = []

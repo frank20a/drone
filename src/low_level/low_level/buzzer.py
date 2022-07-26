@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import BuzzerCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
@@ -13,13 +13,13 @@ class Buzzer(Node):
         self.declare_parameters(
             namespace = '',
             parameters = [
-                ('buzzer_pin', 0),
+                ('pin', 0),
                 ('debug', False),
             ]
         )
 
-        self.pin = self.get_parameter('buzzer_pin').get_parameter_value().integer_value
-        self.debug = self.get_parameter('debug').get_parameter_value().boolean_value
+        self.pin = self.get_parameter('pin').get_parameter_value().integer_value
+        self.debug = self.get_parameter('debug').get_parameter_value().bool_value
 
         self.pi = pigpio.pi()
         if not self.pi.connected:
@@ -28,28 +28,28 @@ class Buzzer(Node):
 
         self.pi.set_mode(self.pin, pigpio.OUTPUT)
 
-        self.create_subscription(String, "buzzer_cmd", self.callback, QoSPresetProfiles.get_from_short_key('system_default'))
+        self.create_subscription(BuzzerCmd, "buzzer_cmd", self.callback, QoSPresetProfiles.get_from_short_key('system_default'))
 
-    def callback(self, msg: String):
-        cmd = msg.data
+    def callback(self, msg: BuzzerCmd):
+        cmd = msg.cmd
 
-        if cmd == 'once':
+        if cmd == BuzzerCmd.CMD_ONCE:
             self.pi.write(self.pin, 1)
             sleep(0.25)
             self.pi.write(self.pin, 0)
 
-        elif cmd == 'on':
+        elif cmd == BuzzerCmd.CMD_ON:
             self.pi.write(self.pin, 1)
 
-        elif cmd == 'off':
+        elif cmd == BuzzerCmd.CMD_OFF:
             self.pi.write(self.pin, 0)
 
-        elif cmd == 'long':
+        elif cmd == BuzzerCmd.CMD_LONG:
             self.pi.write(self.pin, 1)
             sleep(1)
             self.pi.write(self.pin, 0)
 
-        elif cmd == 'twice':
+        elif cmd == BuzzerCmd.CMD_TWICE:
             self.pi.write(self.pin, 1)
             sleep(0.25)
             self.pi.write(self.pin, 0)
@@ -58,7 +58,7 @@ class Buzzer(Node):
             sleep(0.25)
             self.pi.write(self.pin, 0)
         
-        elif cmd == 'error':
+        elif cmd == BuzzerCmd.CMD_ERROR:
             for i in range(40):
                 self.pi.write(self.pin, 1)
                 sleep(0.5 / 40)
