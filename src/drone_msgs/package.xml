@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>drone_interfaces</name>
+  <name>drone_msgs</name>
   <version>1.0.0</version>
-  <description>Some message and service interfaces for the drone project</description>
+  <description>Some messages and services for the drone project</description>
   <maintainer email="frank.fourlas@gmail.com">Frank Fourlas</maintainer>
   <license>MIT</license>
 
