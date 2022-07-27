@@ -28,7 +28,7 @@ class Battery(Node):
 
     def kill(self):
         self.pi.write(5, 0)
-        pi.stop()
+        self.pi.stop()
 
 def main(args=None):
     rclpy.init(args=args)

@@ -1,0 +1,10 @@
+/pid_controller:
+  ros__parameters:
+    freq: 60.0
+    tune_r: [1.0, 0.1, 0.05]
+    tune_p: [1.0, 0.1, 0.05]
+    tune_y: [1.0, 0.1, 0.05]
+    tune_t: [1.0, 0.0, 0.0]
+/**:
+  ros__parameters:
+    test: test

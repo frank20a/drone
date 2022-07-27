@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from drone_interfaces.msg import BuzzerCmd
+from drone_msgs.msg import BuzzerCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
@@ -67,7 +67,7 @@ class Buzzer(Node):
 
     def kill(self):
         self.pi.write(5, 0)
-        pi.stop()
+        self.pi.stop()
 
 def main(args=None):
     rclpy.init(args=args)

@@ -63,10 +63,10 @@ class IMU(Node):
             imu_msg.header.stamp = self.get_clock().now().to_msg()
             imu_msg.header.frame_id = 'imu'
 
-            imu_msg.orientation.x = data['fusionQPose'][0]
-            imu_msg.orientation.y = data['fusionQPose'][1]
-            imu_msg.orientation.z = data['fusionQPose'][2]
-            imu_msg.orientation.w = data['fusionQPose'][3]
+            imu_msg.orientation.x = data['fusionQPose'][1]
+            imu_msg.orientation.y = data['fusionQPose'][2]
+            imu_msg.orientation.z = data['fusionQPose'][3]
+            imu_msg.orientation.w = data['fusionQPose'][0]
 
             imu_msg.linear_acceleration.x = data['accel'][0]
             imu_msg.linear_acceleration.y = data['accel'][1]

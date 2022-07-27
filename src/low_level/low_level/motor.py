@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from drone_interfaces.msg import MotorPercs, MotorCmd
+from drone_msgs.msg import MotorPercs, MotorCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
 from time import sleep
@@ -94,7 +94,7 @@ class Motor(Node):
         
         dbg = []
         for n, val in enumerate(vel):
-            tmp =  val * (self.esc_max - self.esc_min) + self.esc_min
+            tmp =  min(max(self.esc_min, self.esc_min + val * (self.esc_max - self.esc_min)), self.esc_max)
             self.pi.set_servo_pulsewidth(self.pins[n], tmp)
             dbg.append(tmp)
         
@@ -102,8 +102,8 @@ class Motor(Node):
 
     def kill(self):
         for pin in self.pins:
-            self.pi.write(i, 0)
-        pi.stop()
+            self.pi.write(pin, 0)
+        self.pi.stop()
 
 def main(args=None):
     rclpy.init(args=args)
