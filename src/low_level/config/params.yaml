@@ -13,6 +13,11 @@
   ros__parameters:
     baud: 115200
     freq: 10
+/ping_controller:
+  ros__parameters:
+    echo_pin: 6
+    trig_pin: 19
+    freq: 10
 /**:
   ros__parameters:
     debug: true
