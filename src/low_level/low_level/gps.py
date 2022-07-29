@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix, NavSatStatus
+from drone_msgs.msg import DateTime
 from rclpy.qos import QoSPresetProfiles
 from serial import Serial
 from pynmeagps import NMEAReader
@@ -16,44 +17,58 @@ class GPS(Node):
             namespace = '',
             parameters = [
                 ('baud', 0),
-                ('freq', 0),
+                ('freq', 0.0),
                 ('debug', False),
             ]
         )
 
         self.baud = self.get_parameter('baud').get_parameter_value().integer_value
-        self.freq = self.get_parameter('freq').get_parameter_value().integer_value
+        self.freq = self.get_parameter('freq').get_parameter_value().double_value
         self.debug = self.get_parameter('debug').get_parameter_value().bool_value
 
         stream = Serial('/dev/ttyS0', self.baud, timeout=3)
         self.nmr = NMEAReader(stream)
 
         self.pub = self.create_publisher(NavSatFix, 'gps', QoSPresetProfiles.get_from_short_key('sensor_data'))
+        self.pub_time = self.create_publisher(DateTime, 'gps_time', QoSPresetProfiles.get_from_short_key('sensor_data'))
         self.create_timer(1 / self.freq, self.publish_gps)
 
     def publish_gps(self):
         try:
             for _, data in self.nmr:
+                # self.get_logger().info(f'{data}')
                 if data.msgID == 'GGA':
-                    msg = NavSatFix()
+                    try:
+                        msg = NavSatFix()
 
-                    msg.header.stamp = self.get_clock().now().to_msg()
-                    msg.header.frame_id = 'gps'
+                        msg.header.stamp = self.get_clock().now().to_msg()
+                        msg.header.frame_id = 'gps'
 
-                    msg.status.status = NavSatStatus.STATUS_NO_FIX if data.quality == 0 else NavSatStatus.STATUS_FIX
-                    msg.status.service = 15 if data.quality != 0 else 0
+                        msg.status.status = NavSatStatus.STATUS_NO_FIX if data.quality == 0 else NavSatStatus.STATUS_FIX
+                        msg.status.service = 15 if data.quality != 0 else 0
 
-                    msg.latitude = float(data.lat if data.lat != '' else 0)
-                    msg.longitude = float(data.lon if data.lon != '' else 0)
-                    msg.altitude = float(data.alt if data.alt != '' else 0)
-                    msg.position_covariance = [
-                        float(data.HDOP), 0.0, 0.0,
-                        0.0, float(data.HDOP), 0.0,
-                        0.0, 0.0, 0.0
-                    ]
-                    msg.position_covariance_type = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
-                    
-                    self.pub.publish(msg)
+                        msg.latitude = float(data.lat if data.lat != '' else 0)
+                        msg.longitude = float(data.lon if data.lon != '' else 0)
+                        msg.altitude = float(data.alt if data.alt != '' else 0)
+                        msg.position_covariance = [
+                            float(data.HDOP), 0.0, 0.0,
+                            0.0, float(data.HDOP), 0.0,
+                            0.0, 0.0, 0.0
+                        ]
+                        msg.position_covariance_type = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
+                        
+                        self.pub.publish(msg)
+                    except AssertionError:
+                        pass
+                elif data.msgID == 'ZDA':
+                    try:
+                        msg = DateTime()
+                        msg.day = data.day
+                        msg.month = data.month
+                        msg.year = data.year                    
+                        self.get_logger().info(f'{type(data.time)}')
+                    except AssertionError:
+                        pass
         except NMEAParseError:
             pass
 

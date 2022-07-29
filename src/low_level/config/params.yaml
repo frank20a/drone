@@ -8,16 +8,16 @@
     esc_min: 1000
 /imu_controller:
   ros__parameters:
-    freq: 60
+    freq: 75
 /gps_controller:
   ros__parameters:
     baud: 115200
-    freq: 10
+    freq: 10.0
 /ping_controller:
   ros__parameters:
     echo_pin: 6
     trig_pin: 19
-    freq: 10
+    freq: 20.0
 /**:
   ros__parameters:
     debug: true

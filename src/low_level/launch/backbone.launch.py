@@ -63,14 +63,14 @@ def generate_launch_description():
     #     )
     # )
     
-    # ld.add_entity(
-    #     Node(
-    #         package = 'low_level',
-    #         executable =  'ping',
-    #         name = 'ping_controller',
-    #         # output = {'both': 'log'},
-    #         parameters = [config],
-    #     )
-    # )
+    ld.add_entity(
+        Node(
+            package = 'low_level',
+            executable =  'ping',
+            name = 'ping_controller',
+            # output = {'both': 'log'},
+            parameters = [config],
+        )
+    )
 
     return ld

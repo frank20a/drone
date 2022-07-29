@@ -47,7 +47,7 @@ class Ping(Node):
         t = time()
         while self.pi.read(self.echo_pin) == 0:
             t1 = time()
-            if t1 - t > 0.001:
+            if t1 - t > 0.01:
                 return
         
         while self.pi.read(self.echo_pin) == 1 and t1 is not None:
@@ -63,7 +63,7 @@ class Ping(Node):
             msg.data = -1.0
         else:
             msg.data = (t2 - t1) * 171.5
-        self.get_logger().info(f'{msg.data}')
+        # self.get_logger().info(f'{msg.data}')
         self.pub.publish(msg)
 
     def kill(self):
