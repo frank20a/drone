@@ -5,3 +5,5 @@ __pycache__/
 .vscode/
 python_build/
 *.zip
+.qt_for_python/
+*_token.txt
