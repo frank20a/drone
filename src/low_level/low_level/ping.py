@@ -34,7 +34,7 @@ class Ping(Node):
         self.pi.set_mode(self.echo_pin, pigpio.INPUT)
         sleep(2)
 
-        self.pub = self.create_publisher(Float32, "ping_height", QoSPresetProfiles.get_from_short_key('system_default'))
+        self.pub = self.create_publisher(Float32, "ping_height", QoSPresetProfiles.get_from_short_key('sensor_data'))
         self.create_timer(1.0 / self.freq, self.callback)
 
     def callback(self):
