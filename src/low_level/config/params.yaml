@@ -18,6 +18,10 @@
     echo_pin: 6
     trig_pin: 19
     freq: 20.0
+/failsafe:
+  ros__parameters:
+    esc_min: 1000
+    pins: [17, 27, 22, 18]
 /**:
   ros__parameters:
     debug: true

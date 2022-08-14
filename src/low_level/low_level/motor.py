@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Empty
 from drone_msgs.msg import MotorPercs, MotorCmd
 from rclpy.qos import QoSPresetProfiles
 import pigpio
@@ -32,12 +32,15 @@ class Motor(Node):
             exit()
         
         for pin in self.pins:
-            self.pi.set_servo_pulsewidth(pin, 0)
+            self.pi.set_servo_pulsewidth(pin, self.esc_min)
         self.armed = False
         self.throttle = [-1, -1, -1, -1]
 
         self.create_subscription(MotorCmd, "motor_cmd", self.cmd_callback, QoSPresetProfiles.get_from_short_key('system_default'))
         self.create_subscription(MotorPercs, "motor_vel", self.speed_callback, QoSPresetProfiles.get_from_short_key('sensor_data'))
+        self.failsafe_pub = self.create_publisher(Empty, 'reset_failsafe', QoSPresetProfiles.get_from_short_key('sensor_data'))
+
+        self.create_timer(1/10, lambda: self.failsafe_pub.publish(Empty()))
 
     def cmd_callback(self, msg: MotorCmd):
         cmd = msg.cmd
